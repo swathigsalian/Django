@@ -7,7 +7,6 @@ class Rectangle:
         yield {"length": self.length}
         yield {"width": self.width}
 
-# Test the iteration
 rect = Rectangle(10, 5)
 
 for item in rect:
