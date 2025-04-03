@@ -1,0 +1,33 @@
+from django.db import models
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    bio = models.TextField(default="This is my bio")
+
+@receiver(post_save, sender=User)
+def create_profile(sender, instance, **kwargs):
+    print("Signal: Creating Profile...")
+    Profile.objects.create(user=instance)
+    print("Signal: Profile Created")
+
+execute the following test code inside a Django shell:
+
+from django.contrib.auth.models import User
+from myapp.models import Profile
+from django.db import transaction
+
+try:
+    with transaction.atomic():
+        print("Creating user...")
+        user = User.objects.create(username="testuser")
+        print("User created. Now raising exception...")
+        raise Exception("Forcing rollback!")
+except Exception as e:
+    print(f"Exception occurred: {e}")
+
+# Check if Profile was created
+profile_exists = Profile.objects.filter(user__username="testuser").exists()
+print(f"Does the profile exist? {profile_exists}")
