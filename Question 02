@@ -1,0 +1,30 @@
+signals.py
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.contrib.auth.models import User
+import threading
+
+@receiver(post_save, sender=User)
+def my_signal_handler(sender, instance, **kwargs):
+    print(f"Signal running in thread: {threading.current_thread().name}")
+
+
+Apps.py
+
+from django.apps import AppConfig
+
+class MyAppConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'myapp'
+
+    def ready(self):
+        import myapp.signals  
+
+
+
+from django.contrib.auth.models import User
+import threading
+
+print(f"Caller running in thread: {threading.current_thread().name}")
+user = User.objects.create(username="testuser")
