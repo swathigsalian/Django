@@ -1,0 +1,35 @@
+signals.py:
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.contrib.auth.models import User
+import time
+
+@receiver(post_save, sender=User)
+def my_signal_handler(sender, instance, **kwargs):
+    print("Signal started")
+    time.sleep(5)  
+    print("Signal completed")
+
+apps.py:
+
+from django.apps import AppConfig
+
+class MyAppConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'myapp'
+
+    def ready(self):
+        import myapp.signals  # Import the signals module
+
+Django shell:
+
+from django.contrib.auth.models import User
+import time
+
+print("Creating user...")
+start_time = time.time()
+user = User.objects.create(username="testuser")
+end_time = time.time()
+print(f"User created in {end_time - start_time} seconds")
+
